@@ -100,13 +100,13 @@ void Controller::loop() {
         // Iniciar el temporizador seleccionado
         if (currentSelection == WORK) {
           workTimer->start();
-          ledRed->turnOn();
-          ledGreen->turnOff();
+          ledRed->turnOff();
+          ledGreen->turnOn();
           currentState = RUNNING_WORK;
         } else {
           breakTimer->start();
-          ledGreen->turnOn();
-          ledRed->turnOff();
+          ledGreen->turnOff();
+          ledRed->turnOn();
           currentState = RUNNING_BREAK;
         }
         break;
@@ -122,8 +122,8 @@ void Controller::loop() {
           breakTimer->start();
           currentSelection = BREAK_TIME;
           // Encender LED verde y apagar el rojo
-          ledGreen->turnOn();
-          ledRed->turnOff();
+          ledGreen->turnOff();
+          ledRed->turnOn();
           currentState = RUNNING_BREAK;
         } else {
           // Poner el temporizador de descanso a cero
@@ -132,8 +132,8 @@ void Controller::loop() {
           workTimer->start();
           currentSelection = WORK;
           // Encender LED rojo y apagar el verde
-          ledRed->turnOn();
-          ledGreen->turnOff();
+          ledRed->turnOff();
+          ledGreen->turnOn();
           currentState = RUNNING_WORK;
         }
         break;
@@ -143,8 +143,8 @@ void Controller::loop() {
         currentSelection = BREAK_TIME;
         breakTimer->reset();
         breakTimer->start();
-        ledGreen->turnOn();
-        ledRed->turnOff();
+        ledGreen->turnOff();
+        ledRed->turnOn();
         currentState = RUNNING_BREAK;
         break;
 
@@ -153,8 +153,8 @@ void Controller::loop() {
         currentSelection = WORK;
         workTimer->reset();
         workTimer->start();
-        ledRed->turnOn();
-        ledGreen->turnOff();
+        ledRed->turnOff();
+        ledGreen->turnOn();
         currentState = RUNNING_WORK;
         break;
     }
