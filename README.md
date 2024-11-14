@@ -1,8 +1,5 @@
 
 # Pomoduino
-
-![Pomoduino Timer](https://github.com/arfipod/pomoduino/blob/main/images/pomodoro_timer.jpg?raw=true)
-
 ## Description
 
 Pomoduino is an **Arduino-based Pomodoro Timer** utilizing an **Arduino UNO**. The timer features two modes:
