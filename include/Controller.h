@@ -1,14 +1,12 @@
-// Controller.h
-
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "DisplayModule.h"
-#include "EncoderModule.h"
-#include "LEDModule.h"
-#include "TimerModule.h"
+#include "ITimeViewer.h"
+#include "IButton.h"
+#include "ILight.h"
+#include "ITimer.h" // Incluir la interfaz ITimer
 
-// Definir los estados
+// Enumeración para representar el estado del controlador
 enum State {
     IDLE,
     RUNNING_WORK,
@@ -18,42 +16,34 @@ enum State {
 };
 
 class Controller {
-  private:
-    DisplayModule* display1; // Temporizador de 35 minutos
-    DisplayModule* display2; // Temporizador de 10 minutos
-    EncoderModule* encoder;
-    LEDModule* ledRed;
-    LEDModule* ledGreen;
-    TimerModule* workTimer;
-    TimerModule* breakTimer;
-    State currentState;
+private:
+    ITimeViewer* workViewer;   // Visor de tiempo para el temporizador de trabajo
+    ITimeViewer* breakViewer;  // Visor de tiempo para el temporizador de descanso
+    IButton* button;           // Botón genérico para interacción del usuario
+    ILight* ledRed;            // Indicador para el estado de trabajo
+    ILight* ledGreen;          // Indicador para el estado de descanso
+    ITimer* workTimer;         // Temporizador para la sesión de trabajo
+    ITimer* breakTimer;        // Temporizador para la sesión de descanso
+    State currentState;        // Estado actual del controlador
 
-    // Variables para el parpadeo
-    unsigned long lastBlinkTime;
-    bool blinkState;
-
-    // Selección actual: WORK o BREAK
-    TimerType currentSelection;
-
-    // Actualizar displays
+    // Actualiza las pantallas con la información del temporizador
     void updateDisplays();
 
-    // Manejar el parpadeo de los displays
+    // Maneja el parpadeo al finalizar un temporizador
     void handleBlinking();
 
-  public:
-    // Constructor
-    Controller(DisplayModule* disp1, DisplayModule* disp2,
-               EncoderModule* enc, LEDModule* red, LEDModule* green);
+public:
+    // Constructor del controlador
+    Controller(ITimeViewer* work, ITimeViewer* rest, IButton* btn, ILight* red, ILight* green, ITimer* workT, ITimer* breakT);
 
-    // Destructor
-    ~Controller();
-
-    // Inicializar todos los módulos
+    // Configuración inicial del controlador
     void setup();
 
-    // Lógica principal del loop
+    // Lógica principal del controlador que se ejecuta en cada ciclo
     void loop();
+
+    // Destructor para limpiar recursos
+    ~Controller();
 };
 
 #endif // CONTROLLER_H
