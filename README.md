@@ -30,7 +30,7 @@ Equipped with two **TM1637 displays**, a rotary encoder with a button, and two i
 
 ## Circuit Diagram
 
-![Circuit Diagram](https://github.com/arfipod/pomoduino/blob/main/images/circuit_diagram.png?raw=true)
+- TO DO
 
 **Main Connections:**
 
