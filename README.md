@@ -1,5 +1,6 @@
 
 # Pomoduino
+![Pomodoro Timer](images/pomodoro_timer.jpg)
 ## Description
 
 Pomoduino is an **Arduino-based Pomodoro Timer** designed to enhance productivity by alternating between work and break intervals. The timer operates on two platforms:
@@ -37,6 +38,7 @@ Pomoduino is an **Arduino-based Pomodoro Timer** designed to enhance productivit
 
 For the Arduino UNO setup, refer to the circuit diagram below:
 
+[Pending to add]
 ![Circuit Diagram](images/circuit_diagram.png)
 
 ## UML Class Diagram
@@ -94,16 +96,53 @@ cd pomoduino
 │
 ├── src
 │   ├── main.cpp
-│   ├── ...
+│   ├── Controller.cpp
+│   ├── DisplayViewer.cpp
+│   ├── EncoderButton.cpp
+│   ├── LEDIndicator.cpp
+│   ├── TimerModule.cpp
+│   ├── M5Button.cpp
+│   ├── M5Buzzer.cpp
+│   ├── ScreenIndicator.cpp
+│   ├── TextViewer.cpp
+│   ├── EncoderModule.cpp
+│   └── LEDModule.cpp
+│
+├── include
+│   ├── Controller.h
+│   ├── DisplayViewer.h
+│   ├── EncoderButton.h
+│   ├── IButton.h
+│   ├── ILight.h
+│   ├── ITimer.h
+│   ├── ITImeViewer.h
+│   ├── IBuzzer.h
+│   ├── LEDIndicator.h
+│   ├── TimerModule.h
+│   ├── M5Button.h
+│   ├── M5Buzzer.h
+│   ├── ScreenIndicator.h
+│   ├── TextViewer.h
+│   ├── EncoderModule.h
+│   └── LEDModule.h
+│
 ├── lib
 │   └── TM1637Display
 │       ├── TM1637Display.h
 │       └── TM1637Display.cpp
+│
 ├── images
-│   ├── pomodoro_timer.jpg
-│   ├── circuit_diagram.png
-│   └── uml_diagram.png
-└── platformio.ini
+│   ├── pomodoro_timer.jpg         # Visualization of the final device
+│   ├── circuit_diagram.png        # Circuit diagram (rendered from Circuitikz)
+│   └── uml_diagram.png            # UML diagram of the project
+│
+├── test
+│   └── README                     # Placeholder for PlatformIO tests
+│
+├── platformio.ini                 # Project configuration file
+├── README.md                      # Documentation of the project
+└── LICENSE                        # MIT License for the project
+
 ```
 
 ## Contributing
