@@ -1,14 +1,14 @@
 #include <Arduino.h>
 
-// Dependencias del proyecto
+// Project dependencies
 #include "Controller.h"
 #include "DisplayViewer.h"
 #include "TextViewer.h"
 #include "EncoderModule.h"
 #include "LEDModule.h"
-#include "TimerModule.h" // Incluir TimerModule
+#include "TimerModule.h"
 
-// Definir pines para Arduino UNO
+// Define pins for Arduino UNO
 #if defined(ARDUINO_UNO)
 #include "EncoderButton.h"
 #include "LEDIndicator.h"
@@ -21,98 +21,41 @@
 #define ENCODER_SW 8
 #define LED_RED_PIN 9
 #define LED_GREEN_PIN 10
+#define BUZZER_PIN 11
 
-// Definir M5StickCPlus como objetivo
 #elif defined(M5STICKC)
+// Define M5StickCPlus as target
 #include <M5StickCPlus.h>
 #include "M5Button.h"
 #include "ScreenIndicator.h"
+#include "M5Buzzer.h"
+#include "M5BatteryMonitor.h"
 #define WORK_DISPLAY_X 10
 #define WORK_DISPLAY_Y 20
 #define BREAK_DISPLAY_X 10
 #define BREAK_DISPLAY_Y 60
 #endif
 
-// Crear punteros para los viewers y el controller
+// Create pointers for viewers, controller, and modules
 ITimeViewer* workViewer = nullptr;
 ITimeViewer* breakViewer = nullptr;
 Controller* controller = nullptr;
 
-// Crear módulos comunes
 IButton* button = nullptr;
 ILight* ledRed = nullptr;
 ILight* ledGreen = nullptr;
+IBuzzer* buzzer = nullptr;
+IBatteryMonitor* batteryMonitor = nullptr;
 
-// Crear temporizadores
 ITimer* workTimer = nullptr;
 ITimer* breakTimer = nullptr;
 
-// Función para calcular el porcentaje de batería
-float calculateBatteryPercentage(float voltage) {
-    const float MIN_VOLTAGE = 3.0; // Voltaje mínimo (0%)
-    const float MAX_VOLTAGE = 4.2; // Voltaje máximo (100%)
-
-    if (voltage >= MAX_VOLTAGE) {
-        return 100.0;
-    } else if (voltage <= MIN_VOLTAGE) {
-        return 0.0;
-    } else {
-        // Cálculo lineal del porcentaje
-        return ((voltage - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 100.0;
-    }
-}
-
-#if defined(M5STICKC)
-void displayBatteryInfo() {
-    static unsigned long lastBatteryUpdate = 0;
-    const unsigned long BATTERY_UPDATE_INTERVAL = 5000; // 5 segundos
-
-    unsigned long currentTime = millis();
-    if (currentTime - lastBatteryUpdate >= BATTERY_UPDATE_INTERVAL) {
-        // Obtener datos del contador de Coulomb
-        float coulombCharge = M5.Axp.GetCoulombData(); // Carga neta en mAh
-
-        // Definir la capacidad total de la batería (por ejemplo, 110 mAh para M5StickCPlus)
-        const float BATTERY_CAPACITY = 110.0; // Ajusta según la capacidad real de tu batería
-
-        // Calcular el porcentaje de batería
-        float batteryPercentage = (coulombCharge / BATTERY_CAPACITY) * 100.0;
-        batteryPercentage = constrain(batteryPercentage, 0.0, 100.0);
-
-        // Mostrar en la pantalla
-        int x = 220; // Ajusta según necesidad
-        int y = 120; // Ajusta según necesidad
-
-        // Borrar el área anterior de la batería
-        M5.Lcd.fillRect(x - 60, y - 15, 60, 15, TFT_BLACK);
-
-        // Ajustar el cursor al extremo derecho
-        M5.Lcd.setTextDatum(TR_DATUM); // Top Right
-        M5.Lcd.setTextSize(2);
-        M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-        M5.Lcd.drawString("Bat: " + String((int)batteryPercentage) + "%", x, y);
-
-        // Opcional: Mostrar en el monitor serial
-        Serial.print("Carga neta (mAh): ");
-        Serial.println(coulombCharge);
-        Serial.print("Porcentaje de batería: ");
-        Serial.println(batteryPercentage);
-
-        lastBatteryUpdate = currentTime;
-    }
-}
-#endif
-
-void resetCoulombCounter() {
-    M5.Axp.DisableCoulombcounter();
-    M5.Axp.EnableCoulombcounter();
-}
-
-// Configuración inicial
+// Setup function
 void setup() {
     Serial.begin(115200);
 
-    #if defined(ARDUINO_UNO)
+#if defined(ARDUINO_UNO)
+    // Specific initialization for Arduino UNO
     button = new EncoderButton(ENCODER_SW);
     ledRed = new LEDIndicator(LED_RED_PIN);
     ledGreen = new LEDIndicator(LED_GREEN_PIN);
@@ -120,11 +63,13 @@ void setup() {
     breakViewer = new DisplayViewer(BREAK_DISPLAY_CLK, BREAK_DISPLAY_DIO);
     workViewer->init();
     breakViewer->init();
-    #elif defined(M5STICKC)
+    buzzer = new ArduinoBuzzer(BUZZER_PIN);
+    batteryMonitor = nullptr; // No battery monitor for Arduino UNO
+
+#elif defined(M5STICKC)
+    // Specific initialization for M5StickCPlus
     M5.begin();
     M5.Lcd.setRotation(1);
-
-    M5.Axp.EnableCoulombcounter();
 
     button = new M5Button();
     ledRed = new ScreenIndicator(180, 37, RED);
@@ -134,31 +79,34 @@ void setup() {
     breakViewer = new TextViewer(BREAK_DISPLAY_X, BREAK_DISPLAY_Y);
     workViewer->init();
     breakViewer->init();
-    #endif
+    buzzer = new M5Buzzer();
+    batteryMonitor = new M5BatteryMonitor();
+
+#endif
 
     button->init();
     ledRed->init();
     ledGreen->init();
+    buzzer->init();
+    if (batteryMonitor) {
+        batteryMonitor->init();
+    }
 
-    // Crear instancias de TimerModule y asignarlas a ITimer
-    workTimer = new TimerModule(WORK, 35UL * 60 * 1000); // 35 minutos
-    breakTimer = new TimerModule(BREAK_TIME, 10UL * 60 * 1000); // 10 minutos
+    // Create instances of TimerModule and assign to ITimer
+    workTimer = new TimerModule(WORK, 35UL * 60 * 1000);      // 35 minutes
+    breakTimer = new TimerModule(BREAK_TIME, 10UL * 60 * 1000); // 10 minutes
 
-    // Crear el controlador pasando las dependencias
-    controller = new Controller(workViewer, breakViewer, button, ledRed, ledGreen, workTimer, breakTimer);
+    // Create the controller passing dependencies
+    controller = new Controller(workViewer, breakViewer, button, ledRed, ledGreen,
+                                workTimer, breakTimer, buzzer, batteryMonitor);
 
     controller->setup();
 
-    resetCoulombCounter();
+    // Display initial values on viewers
+    workViewer->displayTime(workTimer->getInitialMinutes(), 0);
+    breakViewer->displayTime(breakTimer->getInitialMinutes(), 0);
 }
 
-void loop()
-{
+void loop() {
     controller->loop();
-
-    #if defined(M5STICKC) // TODO Convertir en un componente y remover del loop principal
-    displayBatteryInfo();
-    #endif
 }
-
-

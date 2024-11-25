@@ -13,10 +13,11 @@ enum TimerType {
 class TimerModule : public ITimer {
   private:
     TimerType type;
-    unsigned long duration; // Duración en milisegundos
+    unsigned long duration;        // Duración actual en milisegundos
     unsigned long startTime;
     bool running;
     bool finished;
+    unsigned long initialDuration; // Duración inicial en milisegundos
 
   public:
     // Constructor
@@ -29,6 +30,7 @@ class TimerModule : public ITimer {
     bool isRunning() const override;
     unsigned long getTimeRemaining() const override;
     void reset() override;
+    unsigned long getInitialMinutes() const override; // Método para obtener minutos iniciales
 };
 
 #endif // TIMERMODULE_H

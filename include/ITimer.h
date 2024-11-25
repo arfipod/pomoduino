@@ -22,6 +22,9 @@ public:
 
     // Reiniciar el temporizador
     virtual void reset() = 0;
+
+    // **Nuevo método para obtener los minutos iniciales**
+    virtual unsigned long getInitialMinutes() const = 0;
 };
 
 #endif // ITIMER_H

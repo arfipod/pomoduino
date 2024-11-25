@@ -13,6 +13,7 @@ public:
     DisplayViewer(int clkPin, int dioPin);
     void init();
     void displayTime(int minutes, int seconds) override;
+    void reset() override;
     void clear() override;
 };
 #endif
