@@ -8,7 +8,7 @@ void M5Buzzer::init() {
 }
 
 void M5Buzzer::playTone(unsigned int frequency, unsigned long duration) {
-    M5.Beep.setVolume(1); // Ajustar volumen (0-255)
+    M5.Beep.setVolume(100);
     M5.Beep.tone(frequency, duration);
 }
 
