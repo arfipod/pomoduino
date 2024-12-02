@@ -7,7 +7,7 @@ Pomoduino is an **Arduino-based Pomodoro Timer** designed to enhance productivit
 - **Arduino UNO:** With TM1637 displays, LEDs, and rotary encoder.
 - **M5StickC Plus:** With integrated display, button, and battery monitoring.
 
-Arduino UNO                                          |  M5StickCPlus
+M5StickCPlus                                         |  Arduino UNO 
 :--------------------------------------------------:|:------------------------------------------------:
 ![Pomodoro Timer](images/pomodoro_timer_green.jpg)  |  ![Pomodoro Arduino](images/pomoduinoArduino.gif)
 
